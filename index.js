@@ -45,14 +45,19 @@ async function parse_workbook(xml) {
     if (!xml) return []
 
     let sheets = []
+    let activeTab = 0
 
     await parse_xml(xml, (name, data, path) => {
         if (name === 'sheet') {
             sheets.push(data.attributes)
+        } else if (name === 'workbookView') {
+            if (data.attributes.activeTab) {
+                activeTab = Number(data.attributes.activeTab)
+            }
         }
     })
 
-    return sheets
+    return { sheets, activeTab }
 }
 
 async function parse_workbook_rels(xml) {
@@ -179,14 +184,14 @@ async function get_xml(zip, path) {
 export default async function xlsx2csv(xlsx, callback = console.log) {
     const zip = await JSZip.loadAsync(xlsx)
     const workbook_xml = await get_xml(zip, 'xl/workbook.xml')
-    const sheets = await parse_workbook(workbook_xml)
+    const { sheets, activeTab } = await parse_workbook(workbook_xml)
     const sharedStrings_xml = await get_xml(zip, 'xl/sharedStrings.xml')
     const texts = await parse_sharedStrings(sharedStrings_xml)
     const styles_xml = await get_xml(zip, 'xl/styles.xml')
     const styles = await parse_styles(styles_xml)
     const rels_xml = await get_xml(zip, 'xl/_rels/workbook.xml.rels')
     const rels = await parse_workbook_rels(rels_xml)
-    const sheet1_path = sheets.length > 0 ? `xl/${rels[sheets[0]['r:id']]}` : 'xl/worksheets/sheet1.xml'
+    const sheet1_path = sheets.length > activeTab ? `xl/${rels[sheets[activeTab]['r:id']]}` : 'xl/worksheets/sheet1.xml'
     const sheet1_xml = await get_xml(zip, sheet1_path)
     await parse_sheet(sheet1_xml, texts, styles, callback)
 }
