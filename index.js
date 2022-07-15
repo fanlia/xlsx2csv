@@ -168,8 +168,7 @@ export default async function xlsx2csv(xlsx, callback = console.log) {
     const styles = await parse_styles(styles_xml)
     const rels_xml = await get_xml(zip, 'xl/_rels/workbook.xml.rels')
     const rels = await parse_workbook_rels(rels_xml)
-    const sheet1_rid = sheets[0]['r:id']
-    const sheet1_path = `xl/${rels[sheet1_rid]}`
+    const sheet1_path = sheets.length > 0 ? `xl/${rels[sheets[0]['r:id']]}` : 'xl/worksheets/sheet1.xml'
     const sheet1_xml = await get_xml(zip, sheet1_path)
     await parse_sheet(sheet1_xml, texts, styles, callback)
 }
