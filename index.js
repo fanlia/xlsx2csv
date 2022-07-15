@@ -141,21 +141,25 @@ async function parse_sheet(xml, texts, formats, callback) {
             if (t === 's') {
                 text = texts[text]
             } else if (t === 'e') {
-                text = undefined
+                text = ''
             } else if (formatId) {
                 let numFormat = formats[formatId]
-                const value = Number(text)
-                if (typeof numFormat === 'string') {
-                    const isDate = numfmt.isDate(numFormat)
-                    if (isDate) {
-                        text = formatDate(value)
-                    } else {
-                        text = numfmt.format(numFormat, value)
-                    }
-                } else if (numFormat) {
-                    text = ssf.format(numFormat, value)
+                let value = parseFloat(text)
+                if (isNaN(value)) {
+                    text = ''
                 } else {
-                    text = value
+                    if (typeof numFormat === 'string') {
+                        const isDate = numfmt.isDate(numFormat)
+                        if (isDate) {
+                            text = formatDate(value)
+                        } else {
+                            text = numfmt.format(numFormat, value)
+                        }
+                    } else if (numFormat) {
+                        text = ssf.format(numFormat, value)
+                    } else {
+                        text = value
+                    }
                 }
             }
 
