@@ -2,6 +2,9 @@
 import JSZip from 'jszip'
 import { SaxesParser, EVENTS } from 'saxes'
 import numfmt from "numfmt"
+import ssf from 'ssf'
+
+const ssf_table = ssf.get_table()
 
 function parse_xml(xml, callback) {
 
@@ -39,6 +42,7 @@ function parse_xml(xml, callback) {
 }
 
 async function parse_workbook(xml) {
+    if (!xml) return []
 
     let sheets = []
 
@@ -51,7 +55,24 @@ async function parse_workbook(xml) {
     return sheets
 }
 
+async function parse_workbook_rels(xml) {
+    if (!xml) return []
+
+    let rels = {}
+
+    await parse_xml(xml, (name, data, path) => {
+        if (name === 'Relationship') {
+            const { Id, Target } = data.attributes
+            rels[Id] = Target
+        }
+    })
+
+    return rels
+}
+
 async function parse_sharedStrings(xml) {
+    if (!xml) return []
+
     let texts = []
     let items = []
     await parse_xml(xml, (name, data, path) => {
@@ -67,56 +88,88 @@ async function parse_sharedStrings(xml) {
 }
 
 async function parse_styles(xml) {
+    if (!xml) return []
     let formats = []
+    let numberFormats = {}
     await parse_xml(xml, (name, data, path) => {
-        if (name === 'numFmt') {
+        if (name === 'numFmt' && path[0].name === 'numFmts') {
             const { numFmtId, formatCode } = data.attributes
-            formats.push(formatCode)
+            numberFormats[numFmtId] = formatCode
+        } else if (name === 'xf' && path[0].name === 'cellXfs') {
+            const { numFmtId } = data.attributes
+            formats.push(Number(numFmtId))
         }
     })
 
-    console.log(formats)
+    formats = formats.map(numFmtId => numberFormats[numFmtId] || ssf_table[numFmtId] || numFmtId)
 
     return formats
 }
 
-async function parse_sheet(xml, texts, formats) {
+function formatDate(value) {
+    const [YYYY, MM, DD, hh, mm, ss] = numfmt.dateFromSerial(value).map(num => String(num).padStart(2, '0'))
+    return `${YYYY}-${MM}-${DD} ${hh}:${mm}:${ss}`
+}
 
-    let rows = []
+async function parse_sheet(xml, texts, formats, callback) {
+
     let cells = []
 
     await parse_xml(xml, (name, data, path) => {
-        if (name === 'row') {
-            rows.push(cells)
+        if (name === 'row' || name === 'x:row') {
+            if (cells.length > 0) {
+                callback(cells)
+            }
             cells = []
-        } else if (name === 'v') {
+        } else if (name === 'v' || name === 'x:v') {
             const c = path[0]
             const t = c.attributes.t
+            const formatId = c.attributes.s
             let text = data.text
 
             if (t === 's') {
                 text = texts[text]
+            } else if (t === 'e') {
+                text = undefined
+            } else if (formatId) {
+                let numFormat = formats[formatId]
+                const value = Number(text)
+                if (typeof numFormat === 'string') {
+                    const isDate = numfmt.isDate(numFormat)
+                    if (isDate) {
+                        text = formatDate(value)
+                    } else {
+                        text = numfmt.format(numFormat, value)
+                    }
+                } else if (numFormat) {
+                    text = ssf.format(numFormat, value)
+                } else {
+                    text = value
+                }
             }
 
             cells.push(text)
         }
     })
-
-    console.log(rows)
-
-    return rows
 }
 
-export default async function xlsx2csv(xlsx) {
+async function get_xml(zip, path) {
+    const handle = zip.file(path)
+    return handle && handle.async('string')
+}
+
+export default async function xlsx2csv(xlsx, callback = console.log) {
     const zip = await JSZip.loadAsync(xlsx)
-    console.log(zip)
-    const workbook_xml = await zip.file('xl/workbook.xml').async('string')
-    await parse_workbook(workbook_xml)
-    const sharedStrings_xml = await zip.file('xl/sharedStrings.xml').async('string')
+    const workbook_xml = await get_xml(zip, 'xl/workbook.xml')
+    const sheets = await parse_workbook(workbook_xml)
+    const sharedStrings_xml = await get_xml(zip, 'xl/sharedStrings.xml')
     const texts = await parse_sharedStrings(sharedStrings_xml)
-    const styles_xml = await zip.file('xl/styles.xml').async('string')
+    const styles_xml = await get_xml(zip, 'xl/styles.xml')
     const styles = await parse_styles(styles_xml)
-    const sheet1_xml = await zip.file('xl/worksheets/sheet1.xml').async('string')
-    await parse_sheet(sheet1_xml, texts, styles)
+    const rels_xml = await get_xml(zip, 'xl/_rels/workbook.xml.rels')
+    const rels = await parse_workbook_rels(rels_xml)
+    const sheet1_rid = sheets[0]['r:id']
+    const sheet1_path = `xl/${rels[sheet1_rid]}`
+    const sheet1_xml = await get_xml(zip, sheet1_path)
+    await parse_sheet(sheet1_xml, texts, styles, callback)
 }
-

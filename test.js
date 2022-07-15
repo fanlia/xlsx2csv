@@ -1,7 +1,7 @@
 
 import fs from 'fs'
 
-const buffer = fs.readFileSync('data.xlsx')
+const buffer = fs.readFileSync(process.argv[2])
 
 import xlsx2csv from './index.js'
 
