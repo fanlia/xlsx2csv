@@ -35,7 +35,7 @@ function parse_xml(xml, callback) {
             try {
                 await callback(name, data, [...path])
             } catch (e) {
-                // ignore
+                console.error(e)
             }
         })
 
