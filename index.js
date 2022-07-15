@@ -9,6 +9,8 @@ const ssf_table = ssf.get_table()
 function parse_xml(xml, callback) {
 
     return new Promise((resolve, reject) => {
+        if (!xml) return resolve()
+
         const parser = new SaxesParser()
         parser.on('end', resolve)
         parser.on('error', reject)
@@ -42,7 +44,6 @@ function parse_xml(xml, callback) {
 }
 
 async function parse_workbook(xml) {
-    if (!xml) return []
 
     let sheets = []
     let activeTab = 0
@@ -61,7 +62,6 @@ async function parse_workbook(xml) {
 }
 
 async function parse_workbook_rels(xml) {
-    if (!xml) return []
 
     let rels = {}
 
@@ -76,7 +76,6 @@ async function parse_workbook_rels(xml) {
 }
 
 async function parse_sharedStrings(xml) {
-    if (!xml) return []
 
     let texts = []
     let items = []
@@ -93,7 +92,6 @@ async function parse_sharedStrings(xml) {
 }
 
 async function parse_styles(xml) {
-    if (!xml) return []
     let formats = []
     let numberFormats = {}
     await parse_xml(xml, (name, data, path) => {
@@ -122,7 +120,6 @@ function r2ci(r) {
 }
 
 async function parse_sheet(xml, texts, formats, callback) {
-    if (!xml) return
 
     let cells = []
     let i = 0
