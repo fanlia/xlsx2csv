@@ -151,7 +151,7 @@ async function parse_sheet(xml, texts, formats, callback) {
                     text = ''
                 } else {
                     if (typeof numFormat === 'string') {
-                        const isDate = /d/.test(numFormat) && numfmt.isDate(numFormat)
+                        const isDate = /[yd]/.test(numFormat) && numfmt.isDate(numFormat)
                         if (isDate) {
                             text = formatDate(value)
                         } else {
