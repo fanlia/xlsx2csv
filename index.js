@@ -111,20 +111,30 @@ function formatDate(value) {
     return `${YYYY}-${MM}-${DD} ${hh}:${mm}:${ss}`
 }
 
+function r2ci(r) {
+    const letters = r.replace(/[0-9]/g, '')
+    return letters.split('').reduce((r, a) => r * 26 + parseInt(a, 36) - 9, 0) - 1
+}
+
 async function parse_sheet(xml, texts, formats, callback) {
     if (!xml) return
 
     let cells = []
+    let i = 0
 
     await parse_xml(xml, (name, data, path) => {
         if (name === 'row' || name === 'x:row') {
             if (cells.length > 0 && !cells.every(cell => cell === '')) {
                 callback(cells)
             }
+            i++
             cells = []
         } else if (name === 'v' || name === 'x:v') {
             const c = path[0]
             const t = c.attributes.t
+            const r = c.attributes.r
+
+            const ci = r ? r2ci(r) : i
             const formatId = c.attributes.s
             let text = data.text
 
@@ -149,7 +159,7 @@ async function parse_sheet(xml, texts, formats, callback) {
                 }
             }
 
-            cells.push(text)
+            cells[ci] = text
         }
     })
 }
