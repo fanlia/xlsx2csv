@@ -1,6 +1,6 @@
 
 import JSZip from 'jszip'
-import { SaxesParser, EVENTS } from 'saxes'
+import { SaxesParser } from 'saxes'
 import numfmt from "numfmt"
 import ssf from 'ssf'
 
@@ -112,12 +112,13 @@ function formatDate(value) {
 }
 
 async function parse_sheet(xml, texts, formats, callback) {
+    if (!xml) return
 
     let cells = []
 
     await parse_xml(xml, (name, data, path) => {
         if (name === 'row' || name === 'x:row') {
-            if (cells.length > 0) {
+            if (cells.length > 0 && !cells.every(cell => cell === '')) {
                 callback(cells)
             }
             cells = []
