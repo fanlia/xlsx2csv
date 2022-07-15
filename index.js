@@ -127,7 +127,7 @@ async function parse_sheet(xml, texts, formats, callback) {
             if (cells.length > 0 && !cells.every(cell => cell === '')) {
                 callback(cells)
             }
-            i++
+            i = 0
             cells = []
         } else if (name === 'v' || name === 'x:v') {
             const c = path[0]
@@ -159,7 +159,10 @@ async function parse_sheet(xml, texts, formats, callback) {
                 }
             }
 
+            if (r === undefined && text === '') return
+
             cells[ci] = text
+            i++
         }
     })
 }
