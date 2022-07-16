@@ -33,7 +33,7 @@ xlsx2csv(filename, console.log)
 
 ```
 
-## browser
+### browser
 
 ```javascript
 const buffer = await fetch('data.xlsx').then(res => res.arrayBuffer())
