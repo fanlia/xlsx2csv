@@ -44,7 +44,7 @@ xlsx2csv(filename, console.log)
 ### browser
 
 ```javascript
-// 最多解析 10000 行数据
+// only read <= 10000 rows
 const buffer = await fetch('data.xlsx').then(res => res.arrayBuffer())
 
 xlsx2csv(buffer, console.log)
