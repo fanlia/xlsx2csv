@@ -1,11 +1,10 @@
 
-import fs from 'fs'
-
-const buffer = fs.readFileSync(process.argv[2])
-
+import printMemoryUsage from './print-memory.js'
 import xlsx2csv from './index.js'
 
-xlsx2csv(buffer)
+const filename = (process.argv[2])
+
+xlsx2csv(filename, () => {}).then(printMemoryUsage)
 
 
 

@@ -7,6 +7,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "browser": "index.browser.js",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/fanlia/xlsx2csv.git"
@@ -20,6 +21,7 @@
   "homepage": "https://github.com/fanlia/xlsx2csv#readme",
   "dependencies": {
     "jszip": "^3.10.0",
+    "node-stream-zip": "^1.15.0",
     "numfmt": "^2.4.1",
     "saxes": "^6.0.0",
     "ssf": "^0.11.2"

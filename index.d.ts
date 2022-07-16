@@ -1,5 +1,5 @@
 
-type InputType = ArrayBuffer | Buffer;
+type InputType = ArrayBuffer | string;
 
 type CallbackType = (data: Array<string>) => void;
 

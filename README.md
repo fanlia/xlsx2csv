@@ -1,6 +1,6 @@
 # xlsx2csv
 
-xlsx2csv for browser and nodejs
+xlsx2csv for browser and nodejs with performance considered
 
 ## Install
 
@@ -26,11 +26,10 @@ const { default: xlsx2csv } = await import('@ailnaf/xlsx2csv')
 ### nodejs
 
 ```javascript
-import fs from 'fs'
 
-const buffer = fs.readFileSync('data.xlsx')
+const filename = 'data.xlsx'
 
-xlsx2csv(buffer, console.log)
+xlsx2csv(filename, console.log)
 
 ```
 
