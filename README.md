@@ -2,7 +2,7 @@
 
 xlsx2csv for browser and nodejs with performance considered
 
-[demo](https://fanlia.github.io/xlsx2csv/){:target="\_blank"}
+[demo](https://fanlia.github.io/xlsx2csv/)
 
 ## Install
 
