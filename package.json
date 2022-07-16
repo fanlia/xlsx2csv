@@ -12,7 +12,7 @@
     "type": "git",
     "url": "git+https://github.com/fanlia/xlsx2csv.git"
   },
-  "keywords": [],
+  "keywords": ["xlsx", "csv"],
   "author": "",
   "license": "MIT",
   "bugs": {
