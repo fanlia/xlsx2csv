@@ -184,7 +184,7 @@ export default function xlsx2csvBuilder(Zip, connect) {
         const styles = await parse_styles(styles_xml)
         const rels_xml = await zip.getXML('xl/_rels/workbook.xml.rels')
         const rels = await parse_workbook_rels(rels_xml)
-        const sheet1_path = sheets.length > activeTab ? `xl/${rels[sheets[activeTab]['r:id']]}` : 'xl/worksheets/sheet1.xml'
+        const sheet1_path = sheets.length > activeTab ? `xl/${rels[sheets[activeTab]['r:id']].replace(/^\/xl\//, '')}` : 'xl/worksheets/sheet1.xml'
         const sheet1_xml = await zip.getXML(sheet1_path)
         await parse_sheet(sheet1_xml, texts, styles, callback)
         await zip.close()

@@ -5,7 +5,7 @@ import xlsx2csv from './index.browser.js'
 
 const buffer = fs.readFileSync(process.argv[2])
 
-xlsx2csv(buffer, () => {}).then(printMemoryUsage)
+xlsx2csv(buffer).then(printMemoryUsage)
 
 
 

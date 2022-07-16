@@ -12,7 +12,8 @@ export class Zip {
     }
 
     async getXML(path) {
-        return this.zip.stream(path)
+        const entry = await this.zip.entry(path)
+        return entry && this.zip.stream(entry)
     }
 
     async close() {
