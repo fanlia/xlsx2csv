@@ -55,3 +55,7 @@ xlsx2csv(buffer, console.log)
 ```sh
 node test.js data.xlsx
 ```
+
+## License
+
+MIT
