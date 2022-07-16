@@ -19,6 +19,12 @@ import xlsx2csv from '@ailnaf/xlsx2csv'
 
 ```
 
+### cdn
+
+```html
+<script src="https://unpkg.com/@ailnaf/xlsx2csv/xlsx2csv.min.js"></script>
+```
+
 ### cjs
 
 ```javascript
