@@ -1,0 +1,5 @@
+<script src="./xlsx2csv.min.js"></script>
+<script type="module">
+const buffer = await fetch('data.xlsx').then(res => res.arrayBuffer())
+xlsx2csv(buffer, console.log)
+</script>
