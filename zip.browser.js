@@ -21,6 +21,18 @@ export class Zip {
     }
 }
 
-export function connect(xml, parser) {
-    parser.write(xml).close()
+export function connect(xml, parser, count) {
+    const step = 1000
+    let i = 0
+    while (i < xml.length) {
+        const part = xml.slice(i, i + step)
+        parser.write(part)
+        i += step
+        if (count.value >= count.max) {
+            break
+        }
+    }
+    parser.close()
 }
+
+export const MAX = 10000

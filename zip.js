@@ -33,3 +33,5 @@ export function connect(xml, parser) {
         parser.close()
     })
 }
+
+export const MAX = Infinity

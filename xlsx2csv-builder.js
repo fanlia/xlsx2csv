@@ -3,18 +3,33 @@ import { SaxesParser } from 'saxes'
 import numfmt from "numfmt"
 import ssf from 'ssf'
 
-export default function xlsx2csvBuilder(Zip, connect) {
+export default function xlsx2csvBuilder(Zip, connect, MAX) {
 
     const ssf_table = ssf.get_table()
+
+    let count = { value: 0, max: MAX }
 
     function parse_xml(xml, callback) {
 
         return new Promise((resolve, reject) => {
             if (!xml) return resolve()
+            let unresolved = true
+
+            const resolveonce = () => {
+                if (unresolved) {
+                    unresolved = false
+                    resolve()
+                }
+            }
 
             const parser = new SaxesParser()
-            parser.on('end', resolve)
-            parser.on('error', reject)
+            parser.on('end', resolveonce)
+            parser.on('error', e => {
+                if (count.value >= count.max) {
+                    return resolveonce()
+                }
+                reject(e)
+            })
 
             let path = []
             let text = undefined
@@ -34,13 +49,15 @@ export default function xlsx2csvBuilder(Zip, connect) {
                 data = text === undefined ? { name, attributes } : { name, attributes, text }
                 text = undefined
                 try {
-                    await callback(name, data, [...path])
+                    await callback(name, data, [...path], () => {
+                        count.value++
+                    })
                 } catch (e) {
                     console.error(e)
                 }
             })
 
-            connect(xml, parser)
+            connect(xml, parser, count)
         })
     }
 
@@ -125,10 +142,11 @@ export default function xlsx2csvBuilder(Zip, connect) {
         let cells = []
         let i = 0
 
-        await parse_xml(xml, (name, data, path) => {
+        await parse_xml(xml, (name, data, path, inc) => {
             if (name === 'row' || name === 'x:row') {
                 if (cells.length > 0 && !cells.every(cell => cell === '')) {
                     callback(cells)
+                    inc(true)
                 }
                 i = 0
                 cells = []
