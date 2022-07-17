@@ -148,7 +148,7 @@ export default function xlsx2csvBuilder(Zip, connect, MAX) {
 
         await parse_xml(xml, (name, data, path, stop) => {
             if (name === 'row' || name === 'x:row') {
-                if (cells.length > 0 && !cells.every(cell => cell === '')) {
+                if (cells.length > 0 && !cells.every(cell => cell === '' || cell === undefined)) {
                     if (count > MAX) {
                         stop()
                     } else {
@@ -165,29 +165,30 @@ export default function xlsx2csvBuilder(Zip, connect, MAX) {
 
                 const ci = r ? r2ci(r) : i
                 const formatId = c.attributes.s
-                let text = data.text
+                let text = data.text || ''
+                text = text.trim()
 
-                if (t === 's') {
-                    text = texts[text]
-                } else if (t === 'e') {
-                    text = ''
-                } else if (formatId) {
-                    let numFormat = formats[formatId]
-                    let value = parseFloat(text)
-                    if (isNaN(value)) {
+                if (text.length > 0) {
+                    if (t === 's') {
+                        text = texts[text]
+                    } else if (t === 'e') {
                         text = ''
-                    } else {
-                        if (typeof numFormat === 'string') {
-                            const isDate = /[yd]/.test(numFormat) && numfmt.isDate(numFormat)
-                            if (isDate) {
-                                text = formatDate(value)
+                    } else if (formatId) {
+                        let value = parseFloat(text)
+                        if (!isNaN(value)) {
+                            let numFormat = formats[formatId]
+                            if (typeof numFormat === 'string') {
+                                const isDate = /[yd]/.test(numFormat) && numfmt.isDate(numFormat)
+                                if (isDate) {
+                                    text = formatDate(value)
+                                } else {
+                                    text = numfmt.format(numFormat, value)
+                                }
+                            } else if (numFormat) {
+                                text = ssf.format(numFormat, value)
                             } else {
-                                text = numfmt.format(numFormat, value)
+                                text = value
                             }
-                        } else if (numFormat) {
-                            text = ssf.format(numFormat, value)
-                        } else {
-                            text = value
                         }
                     }
                 }
