@@ -44,7 +44,7 @@ xlsx2csv(filename, console.log)
 ### browser
 
 ```javascript
-// only read <= 10000 rows
+// only first 10000 rows
 const buffer = await fetch('data.xlsx').then(res => res.arrayBuffer())
 
 xlsx2csv(buffer, console.log)
