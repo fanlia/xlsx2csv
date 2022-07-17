@@ -25,6 +25,10 @@
 ></script>
 <script
   crossorigin
+  src="https://unpkg.com/@ant-design/icons/dist/index.umd.min.js"
+></script>
+<script
+  crossorigin
   src="https://unpkg.com/@ailnaf/xlsx2csv/xlsx2csv.min.js"
 ></script>
 <link href="https://unpkg.com/antd/dist/antd.min.css" rel="stylesheet" />
@@ -33,7 +37,8 @@
 
 <script type="text/babel" data-type="module">
     const { useState } = React
-    const { Table, Upload, Button, message } = antd
+    const { Space, Table, Upload, Button, message } = antd
+    const { UploadOutlined, GithubOutlined } = icons
 
     function App() {
 
@@ -97,9 +102,12 @@
 
       return (
         <div className="App">
+          <Space>
           <Upload {...uploadProps}>
-            <Button loading={uploading}>Upload xlsx</Button>
+            <Button loading={uploading} icon={<UploadOutlined />}>Upload xlsx</Button>
           </Upload>
+          <a href="https://github.com/fanlia/xlsx2csv" target="_blank"><GithubOutlined /></a>
+          </Space>
           <Table dataSource={list} columns={columns} />
         </div>
       )
