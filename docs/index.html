@@ -37,7 +37,7 @@
 
 <script type="text/babel" data-type="module">
     const { useState } = React
-    const { Space, Table, Upload, Button, message } = antd
+    const { Table, Upload, Button, message } = antd
     const { UploadOutlined, GithubOutlined } = icons
 
     function App() {
@@ -102,13 +102,15 @@
 
       return (
         <div className="App">
-          <Space>
           <Upload {...uploadProps}>
             <Button loading={uploading} icon={<UploadOutlined />}>Upload xlsx</Button>
           </Upload>
-          <a href="https://github.com/fanlia/xlsx2csv" target="_blank"><GithubOutlined /></a>
-          </Space>
           <Table dataSource={list} columns={columns} />
+          <h2>
+            <a href="https://github.com/fanlia/xlsx2csv" target="_blank">
+                <GithubOutlined />
+            </a>
+          </h2>
         </div>
       )
     }
