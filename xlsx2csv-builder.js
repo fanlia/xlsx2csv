@@ -7,13 +7,17 @@ export default function xlsx2csvBuilder(Zip, connect, MAX) {
 
     const ssf_table = ssf.get_table()
 
-    let count = { value: 0, max: MAX }
-
     function parse_xml(xml, callback) {
 
         return new Promise((resolve, reject) => {
             if (!xml) return resolve()
             let unresolved = true
+
+            let status = { stop: false }
+
+            const stop = () => {
+                status.stop = true
+            }
 
             const resolveonce = () => {
                 if (unresolved) {
@@ -25,7 +29,7 @@ export default function xlsx2csvBuilder(Zip, connect, MAX) {
             const parser = new SaxesParser()
             parser.on('end', resolveonce)
             parser.on('error', e => {
-                if (count.value >= count.max) {
+                if (status.stop) {
                     return resolveonce()
                 }
                 reject(e)
@@ -49,15 +53,13 @@ export default function xlsx2csvBuilder(Zip, connect, MAX) {
                 data = text === undefined ? { name, attributes } : { name, attributes, text }
                 text = undefined
                 try {
-                    await callback(name, data, [...path], () => {
-                        count.value++
-                    })
+                    await callback(name, data, [...path], stop)
                 } catch (e) {
                     console.error(e)
                 }
             })
 
-            connect(xml, parser, count)
+            connect(xml, parser, status)
         })
     }
 
@@ -142,11 +144,17 @@ export default function xlsx2csvBuilder(Zip, connect, MAX) {
         let cells = []
         let i = 0
 
-        await parse_xml(xml, (name, data, path, inc) => {
+        let count = 0
+
+        await parse_xml(xml, (name, data, path, stop) => {
             if (name === 'row' || name === 'x:row') {
                 if (cells.length > 0 && !cells.every(cell => cell === '')) {
-                    callback(cells)
-                    inc(true)
+                    if (count > MAX) {
+                        stop()
+                    } else {
+                        callback(cells)
+                        count++
+                    }
                 }
                 i = 0
                 cells = []
