@@ -83,6 +83,10 @@
       }
 
       const uploadProps = {
+        onRemove: (file) => {
+          setColumns([])
+          setList([])
+        },
         beforeUpload: (file) => {
             handleFile(file)
             return false
