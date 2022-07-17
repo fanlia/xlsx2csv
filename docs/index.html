@@ -33,7 +33,7 @@
 
 <script type="text/babel" data-type="module">
     const { useState } = React
-    const { Table, Upload, Button } = antd
+    const { Table, Upload, Button, message } = antd
 
     function App() {
 
@@ -57,8 +57,11 @@
 
       const handleFile = async (file) => {
           setUploading(true)
-          const buffer = await readFile(file)
           let data = []
+          let columnData = []
+
+          try {
+          const buffer = await readFile(file)
           let header
           await xlsx2csv(buffer, row => {
               if (header) {
@@ -66,12 +69,15 @@
                 data.push({...item, key: data.length})
               } else {
                   header = row
-                  const columnData = header.map(d => ({key: d, dataIndex: d, title: d, ellipsis: true}))
-                  console.log(columnData)
-                  setColumns(columnData)
+                  columnData = header.map(d => ({key: d, dataIndex: d, title: d, ellipsis: true}))
               }
           })
-          console.log(data)
+          } catch (e) {
+            console.error(e)
+            message.error('invalid xlsx file')
+          }
+          console.log({columnData, data})
+          setColumns(columnData)
           setList(data)
           setUploading(false)
       }
