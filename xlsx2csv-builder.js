@@ -184,7 +184,7 @@ export default function xlsx2csvBuilder(Zip, connect, MAX) {
                                 if (isDate) {
                                     text = formatDate(value)
                                 } else {
-                                    text = numfmt.format(numFormat, value)
+                                    text = value
                                 }
                             } else if (numFormat) {
                                 text = ssf.format(numFormat, value)
