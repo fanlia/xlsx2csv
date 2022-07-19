@@ -23,7 +23,7 @@
   },
   "homepage": "https://github.com/fanlia/xlsx2csv#readme",
   "dependencies": {
-    "jszip": "^3.10.0",
+    "fflate": "^0.7.3",
     "node-stream-zip": "^1.15.0",
     "saxes": "^6.0.0",
     "ssf": "^0.11.2"
