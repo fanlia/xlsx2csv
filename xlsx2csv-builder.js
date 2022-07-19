@@ -171,6 +171,8 @@ export default function xlsx2csvBuilder(Zip, connect, MAX) {
                 if (text.length > 0) {
                     if (t === 's') {
                         text = texts[text]
+                    } else if (t === 'b') {
+                        text = text === '0' ? 'FALSE' : 'TRUE'
                     } else if (t === 'e') {
                         text = ''
                     } else if (formatId) {
@@ -197,6 +199,15 @@ export default function xlsx2csvBuilder(Zip, connect, MAX) {
 
                 cells[ci] = text
                 i++
+            } else if (name === 't' || name === 'x:t') {
+                const c = path[1]
+                const t = c.attributes.t
+                const r = c.attributes.r
+                const ci = r ? r2ci(r) : i
+                if (t === 'inlineStr') {
+                    cells[ci] = data.text
+                    i++
+                }
             }
         })
     }
