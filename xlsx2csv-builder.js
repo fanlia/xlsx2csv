@@ -1,6 +1,5 @@
 
 import { SaxesParser } from 'saxes'
-import numfmt from "numfmt"
 import ssf from 'ssf'
 
 export default function xlsx2csvBuilder(Zip, connect, MAX) {
@@ -130,7 +129,8 @@ export default function xlsx2csvBuilder(Zip, connect, MAX) {
     }
 
     function formatDate(value) {
-        const [YYYY, MM, DD, hh, mm, ss] = numfmt.dateFromSerial(value).map(num => String(num).padStart(2, '0'))
+        const { y, m, d, H, M, S } = ssf.parse_date_code(value)
+        const [YYYY, MM, DD, hh, mm, ss] = [y, m, d, H, M, S].map(num => String(num).padStart(2, '0'))
         return `${YYYY}-${MM}-${DD} ${hh}:${mm}:${ss}`
     }
 
@@ -180,9 +180,9 @@ export default function xlsx2csvBuilder(Zip, connect, MAX) {
                         if (!isNaN(value)) {
                             let numFormat = formats[formatId]
                             if (typeof numFormat === 'string') {
-                                const isDate = /[yd]/.test(numFormat) && numfmt.isDate(numFormat)
+                                const isDate = ssf.is_date(numFormat)
                                 if (isDate) {
-                                    text = formatDate(value)
+                                    text = /[yd]/.test(numFormat) ? formatDate(value) : ssf.format(numFormat, value)
                                 } else {
                                     text = value
                                 }
