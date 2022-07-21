@@ -5,9 +5,8 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "build": "esbuild index.browser.js --bundle --format=iife --minify --global-name=xlsx2csv --footer:js=xlsx2csv=xlsx2csv.default --outfile=xlsx2csv.min.js"
+    "build": "esbuild index.js --bundle --format=iife --minify --global-name=xlsx2csv --footer:js=xlsx2csv=xlsx2csv.default --outfile=xlsx2csv.min.js"
   },
-  "browser": "index.browser.js",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/fanlia/xlsx2csv.git"
@@ -23,8 +22,7 @@
   },
   "homepage": "https://github.com/fanlia/xlsx2csv#readme",
   "dependencies": {
-    "fflate": "^0.7.3",
-    "node-stream-zip": "^1.15.0",
+    "jszip": "^3.10.0",
     "saxes": "^6.0.0",
     "ssf": "^0.11.2"
   },
