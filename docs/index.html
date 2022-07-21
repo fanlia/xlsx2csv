@@ -37,11 +37,12 @@
 
 <script type="text/babel" data-type="module">
     const { useState } = React
-    const { Table, Upload, Button, message } = antd
+    const { Table, Upload, Button, InputNumber, message } = antd
     const { UploadOutlined, GithubOutlined } = icons
 
     function App() {
 
+      const [ max, setMax ] = useState(100)
       const [ list, setList ] = useState([])
       const [ columns, setColumns ] = useState([])
       const [uploading, setUploading] = useState(false)
@@ -62,7 +63,7 @@
                   header = row
                   columnData = header.map(d => ({key: d, dataIndex: d, title: d, ellipsis: true}))
               }
-          })
+          }, { sheet: { max } })
           } catch (e) {
             console.error(e)
             message.error('invalid xlsx file')
@@ -88,6 +89,12 @@
 
       return (
         <div className="App">
+        <InputNumber
+          addonBefore="Max Rows"
+          defaultValue={max}
+          step="100"
+          onChange={setMax}
+        />
           <Upload {...uploadProps}>
             <Button loading={uploading} icon={<UploadOutlined />}>Upload xlsx</Button>
           </Upload>
