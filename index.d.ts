@@ -1,5 +1,5 @@
 
-type InputType = ArrayBuffer | Blob | NodeBuffer;
+type InputType = ArrayBuffer | Blob | Buffer | string;
 
 type CallbackType = (data: Array<string>) => void;
 

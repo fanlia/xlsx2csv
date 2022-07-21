@@ -34,12 +34,10 @@ const { default: xlsx2csv } = await import('@ailnaf/xlsx2csv')
 ### nodejs
 
 ```javascript
-import fs from 'fs'
 
 const filename = 'data.xlsx'
-const buffer = fs.readFileSync(filename)
 
-xlsx2csv(buffer, console.log)
+xlsx2csv(filename, console.log)
 
 ```
 
