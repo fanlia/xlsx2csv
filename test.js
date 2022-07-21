@@ -4,7 +4,10 @@ import xlsx2csv from './index.js'
 
 const filename = (process.argv[2])
 
-xlsx2csv(filename).then(printMemoryUsage)
+let max = parseInt(process.argv[3])
+max = isNaN(max) ? Infinity : max
+
+xlsx2csv(filename, console.log, { sheet: { max } }).then(printMemoryUsage)
 
 
 

@@ -22,11 +22,16 @@ export class Zip {
     }
 }
 
-export function connect(xml, parser) {
+export function connect(xml, parser, status) {
     xml.setEncoding('utf8')
 
     xml.on('data', chunk => {
-        parser.write(chunk)
+        if (status.stop) {
+            xml.destroy()
+            parser.close()
+        } else {
+            parser.write(chunk)
+        }
     })
 
     xml.on('end', () => {
