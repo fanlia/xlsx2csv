@@ -53,7 +53,11 @@ xlsx2csv(buffer, console.log, { sheet: { max: 100 } })
 ## Test
 
 ```sh
+# all data
 node test.js data.xlsx
+
+# 1 row
+node test.js data.xlsx 1
 ```
 
 ## License
