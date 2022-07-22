@@ -25,10 +25,6 @@
 ></script>
 <script
   crossorigin
-  src="https://unpkg.com/@ant-design/icons/dist/index.umd.min.js"
-></script>
-<script
-  crossorigin
   src="https://unpkg.com/@ailnaf/xlsx2csv/xlsx2csv.min.js"
 ></script>
 <link href="https://unpkg.com/antd/dist/antd.min.css" rel="stylesheet" />
@@ -38,7 +34,6 @@
 <script type="text/babel" data-type="module">
     const { useState } = React
     const { Table, Upload, Button, InputNumber, message } = antd
-    const { UploadOutlined, GithubOutlined } = icons
 
     function App() {
 
@@ -96,12 +91,12 @@
           onChange={setMax}
         />
           <Upload {...uploadProps}>
-            <Button loading={uploading} icon={<UploadOutlined />}>Upload xlsx</Button>
+            <Button loading={uploading} >Upload xlsx</Button>
           </Upload>
           <Table dataSource={list} columns={columns} />
           <h2>
             <a href="https://github.com/fanlia/xlsx2csv" target="_blank">
-                <GithubOutlined />
+               Github
             </a>
           </h2>
         </div>
