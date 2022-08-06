@@ -50,6 +50,24 @@ xlsx2csv(buffer, console.log, { sheet: { max: 100 } })
 
 ```
 
+### export xlsx
+
+for small files
+
+```javascript
+const source = [
+    ['number1', 'number2', 'hello', 'number3', null, 'date', 'list'],
+    [12.7, 12.8, 'world', '100', null, new Date(), [1,2,3]],
+]
+
+csv2xlsx(source)
+.then(buf => {
+    console.log(buf)
+})
+.catch(console.log)
+
+```
+
 ## Test
 
 ```sh
