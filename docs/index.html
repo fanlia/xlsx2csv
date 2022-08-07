@@ -49,8 +49,7 @@
 
           try {
           let header
-          const buf = await file.arrayBuffer()
-          await xlsx2csv(buf, row => {
+          await xlsx2csv(file, row => {
               if (header) {
                 const item = header.reduce((m, d, i) => ({...m, [d]: row[i]}), {})
                 data.push({...item, key: data.length})
