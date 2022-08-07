@@ -6,9 +6,8 @@
   "browser": "index.browser.js",
   "type": "module",
   "scripts": {
-    "esbuild": "esbuild index.browser.js --bundle --format=iife --global-name=xlsx2csv --footer:js=xlsx2csv=xlsx2csv.default --outfile=xlsx2csv.min.js",
-    "babel": "babel xlsx2csv.min.js --out-file=xlsx2csv.min.js --minified --presets=@babel/preset-env",
-    "build": "npm run esbuild && npm run babel"
+    "esbuild": "esbuild index.browser.js --bundle --format=iife --global-name=xlsx2csv --footer:js=xlsx2csv=xlsx2csv.default --minify --outfile=xlsx2csv.min.js",
+    "build": "npm run esbuild"
   },
   "repository": {
     "type": "git",
@@ -31,9 +30,6 @@
     "ssf": "^0.11.2"
   },
   "devDependencies": {
-    "@babel/cli": "^7.18.9",
-    "@babel/core": "^7.18.9",
-    "@babel/preset-env": "^7.18.9",
     "esbuild": "^0.14.49"
   }
 }
