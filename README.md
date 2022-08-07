@@ -52,9 +52,11 @@ xlsx2csv(buffer, console.log, { sheet: { max: 100 } })
 
 ### export xlsx
 
-for small files
+for small files browser and nodejs
 
 ```javascript
+import csv2xlsx from '@ailnaf/xlsx2csv/csv2xlsx'
+
 const source = [
     ['number1', 'number2', 'hello', 'number3', null, 'date', 'list'],
     [12.7, 12.8, 'world', '100', null, new Date(), [1,2,3]],
