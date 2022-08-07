@@ -1,5 +1,5 @@
 
-import JSZip from 'jszip'
+import { zip, strToU8, unzip, strFromU8 } from 'fflate'
 import template from './template.js'
 
 function numbersToLetter(number) {
@@ -37,11 +37,15 @@ function formatDate(date) {
 
 export default async function csv2xlsx(source) {
 
-    const zip = await JSZip.loadAsync(template, { base64: true })
+    const files = await new Promise((resolve, reject) => {
+        unzip(new Uint8Array(template), (err, data) => {
+            err ? reject(err) : resolve(data)
+        })
+    })
 
     const sheet1_path = 'xl/worksheets/sheet1.xml'
 
-    const sheet1_xml = await zip.file(sheet1_path ).async('string')
+    const sheet1_xml = strFromU8(files[sheet1_path])
 
     const [sheetHeader, sheetFooter] = sheet1_xml.split(/<sheetData\/>|<sheetData>.*<\/sheetData>/)
 
@@ -68,14 +72,12 @@ export default async function csv2xlsx(source) {
 
     const new_sheet1_xml = [sheetHeader, '<sheetData>', sheetData, '</sheetData>', sheetFooter].join(',')
 
-    zip.file(sheet1_path, new_sheet1_xml)
+    files[sheet1_path] = strToU8(new_sheet1_xml)
 
-    const buffer = await zip.generateAsync({
-        type: "uint8array",
-        compression: "DEFLATE",
-        compressionOptions: {
-            level: 9
-        }
+    const buffer = await new Promise((resolve, reject) => {
+        zip(files, (err, data) => {
+            err ? reject(err) : resolve(data)
+        })
     })
 
     return buffer

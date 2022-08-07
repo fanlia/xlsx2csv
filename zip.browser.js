@@ -1,5 +1,5 @@
 
-import JSZip from 'jszip'
+import { unzip, strFromU8 } from 'fflate'
 
 export class Zip {
     constructor(zip) {
@@ -7,13 +7,17 @@ export class Zip {
     }
 
     static async loadAsync(xlsx) {
-        const zip = await JSZip.loadAsync(xlsx)
+        const zip = await new Promise((resolve, reject) => {
+            unzip(new Uint8Array(xlsx), (err, unzipped) => {
+                err ? reject(err) : resolve(unzipped)
+            })
+        })
         return new Zip(zip)
     }
 
     async getXML(path) {
-        const handle = this.zip.file(path)
-        return handle && handle.internalStream('string')
+        const handle = this.zip[path]
+        return handle && strFromU8(handle)
     }
 
     async close() {
@@ -22,19 +26,15 @@ export class Zip {
 }
 
 export function connect(xml, parser, status) {
-
-    xml.on('data', chunk => {
+    const step = 1000
+    let i = 0
+    while (i < xml.length) {
         if (status.stop) {
-            xml.pause()
-            parser.close()
-        } else {
-            parser.write(chunk)
+            break
         }
-    })
-
-    xml.on('end', () => {
-        parser.close()
-    })
-
-    xml.resume()
+        const part = xml.slice(i, i + step)
+        parser.write(part)
+        i += step
+    }
+    parser.close()
 }
