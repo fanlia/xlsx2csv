@@ -49,7 +49,7 @@
 
           try {
           let header
-          const buf = file.arrayBuffer()
+          const buf = await file.arrayBuffer()
           await xlsx2csv(buf, row => {
               if (header) {
                 const item = header.reduce((m, d, i) => ({...m, [d]: row[i]}), {})
