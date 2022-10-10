@@ -1,7 +1,9 @@
 
 type InputType = ArrayBuffer | Blob | Buffer | string;
 
-type CallbackType = (data: Array<string>) => void;
+type CellType = string | number | boolean;
+
+type CallbackType = (data: Array<CellType> | Array<Array<CellType>> ) => void;
 
 type SheetOptions = {
     max: number,
