@@ -5,6 +5,7 @@ type CallbackType = (data: Array<string>) => void;
 
 type SheetOptions = {
     max: number,
+    collect: boolean,
 }
 
 type Options = {

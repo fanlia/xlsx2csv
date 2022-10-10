@@ -46,7 +46,17 @@ xlsx2csv(filename, console.log)
 ```javascript
 const buffer = await fetch('data.xlsx').then(res => res.blob())
 
+// one row at a time
 xlsx2csv(buffer, console.log, { sheet: { max: 100 } })
+
+// [ 'hello', 'world' ]
+// [ 'bar', 'foo' ]
+
+
+// all rows
+xlsx2csv(buffer, console.log, { sheet: { max: 100, collect: true } })
+
+// [ [ 'hello', 'world' ], [ 'bar', 'foo' ] ]
 
 ```
 
