@@ -167,7 +167,7 @@ export default function xlsx2csvBuilder(Zip, connect) {
                     }
                 }
                 i = 0
-                cells = []
+                cells = new Array(cells.length)
             } else if (name === 'v' || name === 'x:v') {
                 const c = path[0]
                 const t = c.attributes.t
