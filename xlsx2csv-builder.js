@@ -160,9 +160,12 @@ export default function xlsx2csvBuilder(Zip, connect) {
                     } else {
                         if (collect) {
                             rows.push(cells)
-                        } else {
+                        }
+
+                        if (typeof callback === 'function'){
                             callback(cells)
                         }
+
                         count++
                     }
                 }
@@ -221,9 +224,7 @@ export default function xlsx2csvBuilder(Zip, connect) {
             }
         })
 
-        if (collect) {
-            callback(rows)
-        }
+        return rows
     }
 
     return async function xlsx2csv(xlsx, callback = console.log, options = {}) {
@@ -238,7 +239,8 @@ export default function xlsx2csvBuilder(Zip, connect) {
         const rels = await parse_workbook_rels(rels_xml)
         const sheet1_path = sheets.length > activeTab ? `xl/${rels[sheets[activeTab]['r:id']].replace(/^\/xl\//, '')}` : 'xl/worksheets/sheet1.xml'
         const sheet1_xml = await zip.getXML(sheet1_path)
-        await parse_sheet(sheet1_xml, texts, styles, callback, options.sheet)
+        const rows = await parse_sheet(sheet1_xml, texts, styles, callback, options.sheet)
         await zip.close()
+        return rows
     }
 }
