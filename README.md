@@ -57,6 +57,10 @@ console.log(rows)
 
 // [ [ 'hello', 'world' ], [ 'bar', 'foo' ] ]
 
+const rows = await xlsx2csv(buffer, null, { sheet: { max: 100, collect: true, json: true } })
+console.log(rows)
+
+// [ { hello: 'bar', world: 'foo' } ]
 ```
 
 ### export xlsx

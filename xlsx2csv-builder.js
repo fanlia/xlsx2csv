@@ -144,8 +144,10 @@ export default function xlsx2csvBuilder(Zip, connect) {
         const {
             max = Infinity,
             collect = false,
+            json = false,
         } = options
 
+        let header = null
         let rows = []
         let cells = []
         let i = 0
@@ -158,12 +160,26 @@ export default function xlsx2csvBuilder(Zip, connect) {
                     if (count > max) {
                         stop()
                     } else {
-                        if (collect) {
-                            rows.push(cells)
+                        let record = null
+
+                        if (json) {
+                            if (header) {
+                                record = header.reduce((m, d, i) => ({...m, [d]: cells[i]}), {})
+                            } else {
+                                header = cells
+                            }
+                        } else {
+                            record = cells
                         }
 
-                        if (typeof callback === 'function'){
-                            callback(cells)
+                        if (record) {
+                            if (collect) {
+                                rows.push(record)
+                            }
+
+                            if (typeof callback === 'function'){
+                                callback(record)
+                            }
                         }
 
                         count++

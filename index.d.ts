@@ -3,7 +3,7 @@ type InputType = ArrayBuffer | Blob | Buffer | string;
 
 type CellType = string | number | boolean;
 
-type RowType = Array<CellType>;
+type RowType = Array<CellType> | { [key: string]: CellType };
 
 type CallbackType = (data: RowType) => void;
 
