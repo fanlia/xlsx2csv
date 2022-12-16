@@ -1,6 +1,6 @@
 {
   "name": "@ailnaf/xlsx2csv",
-  "version": "1.3.6",
+  "version": "1.3.7",
   "description": "convert xlsx to csv",
   "main": "index.js",
   "browser": "index.browser.js",
