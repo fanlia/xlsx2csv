@@ -2,6 +2,8 @@
 import { SaxesParser } from 'saxes'
 import ssf from 'ssf'
 
+const InvisibleSpace = String.fromCodePoint(65039)
+
 export default function xlsx2csvBuilder(Zip, connect) {
 
     const ssf_table = ssf.get_table()
@@ -103,7 +105,7 @@ export default function xlsx2csvBuilder(Zip, connect) {
                 texts.push(items.join(''))
                 items = []
             } else if (name === 't') {
-                items.push(data.text)
+                items.push(data.text.trim())
             }
         })
 
@@ -156,7 +158,7 @@ export default function xlsx2csvBuilder(Zip, connect) {
 
         await parse_xml(xml, (name, data, path, stop) => {
             if (name === 'row' || name === 'x:row') {
-                if (cells.length > 0 && !cells.every(cell => cell === '' || cell === undefined)) {
+                if (cells.length > 0 && !cells.every(cell => cell === '' || cell === undefined || cell === InvisibleSpace)) {
                     if (count > max) {
                         stop()
                     } else {
