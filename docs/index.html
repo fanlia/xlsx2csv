@@ -39,6 +39,43 @@
     const { useState } = React
     const { Table, Upload, Button, InputNumber, message } = antd
 
+    const filters = [
+      {
+        text: 'Invalid date',
+        value: 'date',
+      },
+      {
+        text: 'Invalid number',
+        value: 'number',
+      },
+    ]
+
+    //  isNaN
+    function floatformat (number_str) {
+        const fixed = (+number_str).toFixed(7)
+        const value = +fixed
+        return isNaN(value)
+    }
+
+    // isValid
+    function dateformat(date_str) {
+      const value = dayjs(value)
+      return !value.isValid()
+    }
+
+    const handleFilter = (type, value) => {
+      if (typeof value !== 'string') {
+        return true
+      }
+      if (type === 'date') {
+        return dateformat(value)
+      }
+      if (type === 'number') {
+        return floatformat(value)
+      }
+      return false
+    }
+
     function App() {
 
       const [ max, setMax ] = useState(100)
@@ -59,7 +96,14 @@
                 data.push({...item, key: data.length})
               } else {
                   header = row
-                  columnData = header.map(d => ({key: d, dataIndex: d, title: d, ellipsis: true}))
+                  columnData = header.map(d => ({
+                    key: d,
+                    dataIndex: d,
+                    title: d,
+                    ellipsis: true,
+                    filters,
+                    onFilter: (value, record) => handleFilter(value, record[d]),
+                  }))
               }
           }, { sheet: { max } })
           } catch (e) {
