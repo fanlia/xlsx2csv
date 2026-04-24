@@ -9,7 +9,8 @@
         box-sizing: border-box;
       }
       body {
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        font-family:
+          -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         margin: 0;
         padding: 20px;
         background: #f5f5f5;
@@ -55,14 +56,15 @@
         background: #fff;
         border-radius: 8px;
         overflow: hidden;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
       }
       table {
         width: 100%;
         border-collapse: collapse;
         font-size: 14px;
       }
-      th, td {
+      th,
+      td {
         padding: 12px 16px;
         text-align: left;
         border-bottom: 1px solid #f0f0f0;
@@ -86,7 +88,7 @@
         background: #fff;
         border: 1px solid #d9d9d9;
         border-radius: 4px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
         z-index: 100;
         min-width: 120px;
       }
@@ -127,8 +129,19 @@
     <div class="app">
       <div class="controls">
         <label>Max Rows</label>
-        <input type="number" id="maxInput" class="input-number" value="100" step="100" />
-        <input type="file" id="fileInput" accept=".xlsx" style="display:none" />
+        <input
+          type="number"
+          id="maxInput"
+          class="input-number"
+          value="100"
+          step="100"
+        />
+        <input
+          type="file"
+          id="fileInput"
+          accept=".xlsx"
+          style="display: none"
+        />
         <button id="uploadBtn" class="btn">Upload xlsx</button>
         <button id="clearBtn" class="btn">Clear</button>
       </div>
@@ -171,7 +184,9 @@
         try {
           const max = parseInt(maxInput.value) || 100
           const rows = []
-          const header = await xlsx2csv(file, (row) => rows.push(row), { sheet: { max } })
+          const header = await xlsx2csv(file, (row) => rows.push(row), {
+            sheet: { max },
+          })
 
           if (rows.length === 0) {
             renderTable()
@@ -196,6 +211,8 @@
             })
             return item
           })
+
+          console.log({ columns, tableData })
 
           renderTable()
         } catch (err) {
@@ -230,7 +247,9 @@
           renderTable()
           return
         }
-        const filtered = tableData.filter((row) => handleFilter(filterType, row[columnKey]))
+        const filtered = tableData.filter((row) =>
+          handleFilter(filterType, row[columnKey]),
+        )
         renderTable(filtered)
       }
 
@@ -239,7 +258,9 @@
         const tbody = dataTable.querySelector('tbody')
 
         thead.innerHTML = columns.length
-          ? `<tr>${columns.map((col) => `
+          ? `<tr>${columns
+              .map(
+                (col) => `
             <th>
               ${col.title}
               <span class="filter-drop" data-key="${col.key}">
@@ -251,12 +272,18 @@
                 </div>
               </span>
             </th>
-          `).join('')}</tr>`
+          `,
+              )
+              .join('')}</tr>`
           : ''
 
-        tbody.innerHTML = data.map((row) => `
+        tbody.innerHTML = data
+          .map(
+            (row) => `
           <tr>${columns.map((col) => `<td title="${row[col.key]}">${row[col.key] ?? ''}</td>`).join('')}</tr>
-        `).join('')
+        `,
+          )
+          .join('')
 
         thead.querySelectorAll('.filter-drop').forEach((drop) => {
           const columnKey = drop.dataset.key
@@ -282,8 +309,11 @@
       }
 
       document.addEventListener('click', () => {
-        document.querySelectorAll('.filter-menu').forEach((m) => m.classList.remove('show'))
+        document
+          .querySelectorAll('.filter-menu')
+          .forEach((m) => m.classList.remove('show'))
       })
     </script>
   </body>
 </html>
+
