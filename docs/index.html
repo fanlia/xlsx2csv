@@ -1,156 +1,289 @@
-
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
+  <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>xlsx2csv</title>
-    <link crossorigin href="https://unpkg.com/antd/dist/reset.css" rel="stylesheet" />
-</head>
-<body>
-<div id="root">Loading...</div>
-<script
-  crossorigin
-  src="https://unpkg.com/react/umd/react.production.min.js"
-></script>
-<script
-  crossorigin
-  src="https://unpkg.com/react-dom/umd/react-dom.production.min.js"
-></script>
-<script
-  crossorigin
-  src="https://unpkg.com/@babel/standalone/babel.min.js"
-></script>
-<script
-  crossorigin
-  src="https://unpkg.com/dayjs/dayjs.min.js"
-></script>
-<script
-  crossorigin
-  src="https://unpkg.com/antd/dist/antd.min.js"
-></script>
-<script
-  crossorigin
-  src="https://unpkg.com/@ailnaf/xlsx2csv/xlsx2csv.min.js"
-></script>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        margin: 0;
+        padding: 20px;
+        background: #f5f5f5;
+      }
+      .app {
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+      .controls {
+        margin-bottom: 20px;
+        display: flex;
+        gap: 12px;
+        align-items: center;
+      }
+      .controls label {
+        font-weight: 500;
+      }
+      .input-number {
+        padding: 8px 12px;
+        border: 1px solid #d9d9d9;
+        border-radius: 4px;
+        width: 120px;
+        font-size: 14px;
+      }
+      .btn {
+        padding: 8px 20px;
+        border: 1px solid #d9d9d9;
+        border-radius: 4px;
+        background: #fff;
+        cursor: pointer;
+        font-size: 14px;
+        transition: all 0.2s;
+      }
+      .btn:hover {
+        border-color: #40a9ff;
+        color: #40a9ff;
+      }
+      .btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+      .table-wrap {
+        background: #fff;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 14px;
+      }
+      th, td {
+        padding: 12px 16px;
+        text-align: left;
+        border-bottom: 1px solid #f0f0f0;
+      }
+      th {
+        background: #fafafa;
+        font-weight: 600;
+        position: relative;
+      }
+      th .filter-drop {
+        display: inline-block;
+        margin-left: 8px;
+        cursor: pointer;
+        position: relative;
+      }
+      th .filter-menu {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        background: #fff;
+        border: 1px solid #d9d9d9;
+        border-radius: 4px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        z-index: 100;
+        min-width: 120px;
+      }
+      th .filter-menu.show {
+        display: block;
+      }
+      th .filter-item {
+        padding: 8px 12px;
+        cursor: pointer;
+      }
+      th .filter-item:hover {
+        background: #f5f5f5;
+      }
+      th .filter-item.active {
+        background: #e6f7ff;
+        color: #1890ff;
+      }
+      td {
+        max-width: 200px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .github {
+        margin-top: 20px;
+        text-align: center;
+      }
+      .github a {
+        color: #1890ff;
+        text-decoration: none;
+      }
+      .github a:hover {
+        text-decoration: underline;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app">
+      <div class="controls">
+        <label>Max Rows</label>
+        <input type="number" id="maxInput" class="input-number" value="100" step="100" />
+        <input type="file" id="fileInput" accept=".xlsx" style="display:none" />
+        <button id="uploadBtn" class="btn">Upload xlsx</button>
+        <button id="clearBtn" class="btn">Clear</button>
+      </div>
+      <div class="table-wrap">
+        <table id="dataTable">
+          <thead></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div class="github">
+        <a href="https://github.com/fanlia/xlsx2csv" target="_blank">Github</a>
+      </div>
+    </div>
+    <script src="https://unpkg.com/dayjs/dayjs.min.js"></script>
+    <script src="https://unpkg.com/@ailnaf/xlsx2csv/xlsx2csv.min.js"></script>
+    <script>
+      const maxInput = document.getElementById('maxInput')
+      const fileInput = document.getElementById('fileInput')
+      const uploadBtn = document.getElementById('uploadBtn')
+      const clearBtn = document.getElementById('clearBtn')
+      const dataTable = document.getElementById('dataTable')
 
+      let tableData = []
+      let columns = []
 
-<script type="text/babel" data-type="module">
-    const { useState } = React
-    const { Table, Upload, Button, InputNumber, message } = antd
+      uploadBtn.addEventListener('click', () => fileInput.click())
+      clearBtn.addEventListener('click', () => {
+        tableData = []
+        columns = []
+        renderTable()
+        fileInput.value = ''
+      })
+      fileInput.addEventListener('change', async (e) => {
+        const file = e.target.files[0]
+        if (!file) return
 
-    const filters = [
-      {
-        text: 'Invalid date',
-        value: 'date',
-      },
-      {
-        text: 'Invalid number',
-        value: 'number',
-      },
-    ]
+        uploadBtn.disabled = true
+        uploadBtn.textContent = 'Loading...'
 
-    //  isNaN
-    function floatformat (number_str) {
-        const fixed = (+number_str).toFixed(7)
+        try {
+          const max = parseInt(maxInput.value) || 100
+          const rows = []
+          const header = await xlsx2csv(file, (row) => rows.push(row), { sheet: { max } })
+
+          if (rows.length === 0) {
+            renderTable()
+            uploadBtn.disabled = false
+            uploadBtn.textContent = 'Upload xlsx'
+            return
+          }
+
+          columns = rows[0].map((d) => ({
+            key: d,
+            title: d,
+            filters: [
+              { text: 'Invalid date', value: 'date' },
+              { text: 'Invalid number', value: 'number' },
+            ],
+          }))
+
+          tableData = rows.slice(1).map((row, i) => {
+            const item = { key: i }
+            rows[0].forEach((d, idx) => {
+              item[d] = row[idx]
+            })
+            return item
+          })
+
+          renderTable()
+        } catch (err) {
+          console.error(err)
+          alert('Invalid xlsx file')
+        }
+
+        uploadBtn.disabled = false
+        uploadBtn.textContent = 'Upload xlsx'
+      })
+
+      function floatformat(numberStr) {
+        const fixed = (+numberStr).toFixed(7)
         const value = +fixed
         return isNaN(value)
-    }
-
-    // isValid
-    function dateformat(date_str) {
-      const value = dayjs(value)
-      return !value.isValid()
-    }
-
-    const handleFilter = (type, value) => {
-      if (typeof value !== 'string') {
-        return true
-      }
-      if (type === 'date') {
-        return dateformat(value)
-      }
-      if (type === 'number') {
-        return floatformat(value)
-      }
-      return false
-    }
-
-    function App() {
-
-      const [ max, setMax ] = useState(100)
-      const [ list, setList ] = useState([])
-      const [ columns, setColumns ] = useState([])
-      const [uploading, setUploading] = useState(false)
-
-      const handleFile = async (file) => {
-          setUploading(true)
-          let data = []
-          let columnData = []
-
-          try {
-          let header
-          await xlsx2csv(file, row => {
-              if (header) {
-                const item = header.reduce((m, d, i) => ({...m, [d]: row[i]}), {})
-                data.push({...item, key: data.length})
-              } else {
-                  header = row
-                  columnData = header.map(d => ({
-                    key: d,
-                    dataIndex: d,
-                    title: d,
-                    ellipsis: true,
-                    filters,
-                    onFilter: (value, record) => handleFilter(value, record[d]),
-                  }))
-              }
-          }, { sheet: { max } })
-          } catch (e) {
-            console.error(e)
-            message.error('invalid xlsx file')
-          }
-          console.log({columnData, data})
-          setColumns(columnData)
-          setList(data)
-          setUploading(false)
       }
 
-      const uploadProps = {
-        onRemove: (file) => {
-          setColumns([])
-          setList([])
-        },
-        beforeUpload: (file) => {
-            handleFile(file)
-            return false
-        },
-        maxCount: 1,
-        accept: '.xlsx',
+      function dateformat(dateStr) {
+        const value = dayjs(dateStr)
+        return !value.isValid()
       }
 
-      return (
-        <div className="App">
-        <InputNumber
-          addonBefore="Max Rows"
-          defaultValue={max}
-          step="100"
-          onChange={setMax}
-        />
-          <Upload {...uploadProps}>
-            <Button loading={uploading} >Upload xlsx</Button>
-          </Upload>
-          <Table dataSource={list} columns={columns} />
-          <h2>
-            <a href="https://github.com/fanlia/xlsx2csv" target="_blank">
-               Github
-            </a>
-          </h2>
-        </div>
-      )
-    }
+      function handleFilter(type, value) {
+        if (typeof value !== 'string') return false
+        if (type === 'date') return dateformat(value)
+        if (type === 'number') return floatformat(value)
+        return false
+      }
 
-    ReactDOM.render(<App />, document.getElementById('root'))
-</script>
-</body>
+      function filterData(columnKey, filterType) {
+        if (!filterType) {
+          renderTable()
+          return
+        }
+        const filtered = tableData.filter((row) => handleFilter(filterType, row[columnKey]))
+        renderTable(filtered)
+      }
+
+      function renderTable(data = tableData) {
+        const thead = dataTable.querySelector('thead')
+        const tbody = dataTable.querySelector('tbody')
+
+        thead.innerHTML = columns.length
+          ? `<tr>${columns.map((col) => `
+            <th>
+              ${col.title}
+              <span class="filter-drop" data-key="${col.key}">
+                ▼
+                <div class="filter-menu">
+                  <div class="filter-item" data-type="">All</div>
+                  <div class="filter-item" data-type="date">Invalid date</div>
+                  <div class="filter-item" data-type="number">Invalid number</div>
+                </div>
+              </span>
+            </th>
+          `).join('')}</tr>`
+          : ''
+
+        tbody.innerHTML = data.map((row) => `
+          <tr>${columns.map((col) => `<td title="${row[col.key]}">${row[col.key] ?? ''}</td>`).join('')}</tr>
+        `).join('')
+
+        thead.querySelectorAll('.filter-drop').forEach((drop) => {
+          const columnKey = drop.dataset.key
+          const menu = drop.querySelector('.filter-menu')
+
+          drop.addEventListener('click', (e) => {
+            e.stopPropagation()
+            document.querySelectorAll('.filter-menu').forEach((m) => {
+              if (m !== menu) m.classList.remove('show')
+            })
+            menu.classList.toggle('show')
+          })
+
+          menu.querySelectorAll('.filter-item').forEach((item) => {
+            item.addEventListener('click', (e) => {
+              e.stopPropagation()
+              const filterType = item.dataset.type
+              filterData(columnKey, filterType)
+              menu.classList.remove('show')
+            })
+          })
+        })
+      }
+
+      document.addEventListener('click', () => {
+        document.querySelectorAll('.filter-menu').forEach((m) => m.classList.remove('show'))
+      })
+    </script>
+  </body>
 </html>
