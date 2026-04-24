@@ -155,7 +155,6 @@
         <a href="https://github.com/fanlia/xlsx2csv" target="_blank">Github</a>
       </div>
     </div>
-    <script src="https://unpkg.com/dayjs/dayjs.min.js"></script>
     <script src="https://unpkg.com/@ailnaf/xlsx2csv/xlsx2csv.min.js"></script>
     <script>
       const maxInput = document.getElementById('maxInput')
@@ -231,8 +230,8 @@
       }
 
       function dateformat(dateStr) {
-        const value = dayjs(dateStr)
-        return !value.isValid()
+        const value = new Date(dateStr)
+        return isNaN(value)
       }
 
       function handleFilter(type, value) {
